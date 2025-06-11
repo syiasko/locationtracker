@@ -1,0 +1,44 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>CMS Dashboard</title></head>
+<body>
+<h2>Tracker Logs</h2>
+<table border="1">
+  <thead>
+    <tr>
+      <th>Timestamp</th><th>Method</th><th>Lat</th><th>Lon</th>
+      <th>IP</th><th>City</th><th>Region</th><th>Country</th><th>Address</th>
+      <th>UA</th><th>Lang</th><th>Screen</th><th>Platform</th>
+    </tr>
+  </thead>
+  <tbody id="logs"></tbody>
+</table>
+<script>
+  fetch("/logs")
+    .then(r => r.json())
+    .then(arr => {
+      const tbody = document.getElementById("logs");
+      arr.slice().reverse().forEach(e => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${e.timestamp}</td>
+          <td>${e.method}</td>
+          <td>${e.latitude}</td>
+          <td>${e.longitude}</td>
+          <td>${e.ip||''}</td>
+          <td>${e.city||''}</td>
+          <td>${e.region||''}</td>
+          <td>${e.country||''}</td>
+          <td>${e.address||''}</td>
+          <td>${e.userAgent}</td>
+          <td>${e.language}</td>
+          <td>${e.screen}</td>
+          <td>${e.platform}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    });
+</script>
+</body>
+</html>
