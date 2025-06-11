@@ -8,6 +8,12 @@
     const r = await fetch("https://ipapi.co/json/"); return await r.json();
   }
 
+  async function reverseGeocode(lat, lon) {
+    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`);
+    const json = await res.json();
+    return json.display_name || '';
+  }
+
   async function collectData() {
     let method = "IP", lat, lon, address, city, region, country, ip;
     const device = {
@@ -20,13 +26,12 @@
     try {
       const pos = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, {enableHighAccuracy:true,timeout:5000}));
       method = "GPS"; lat = pos.coords.latitude; lon = pos.coords.longitude;
-      const geo = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=YOUR_GOOGLE_API_KEY`);
-      const js = await geo.json();
-      address = js.results[0]?.formatted_address;
+      address = await reverseGeocode(lat, lon);
     } catch {
       const ipInfo = await getIPInfo();
       ip = ipInfo.ip; city = ipInfo.city; region = ipInfo.region; country = ipInfo.country_name;
       lat = ipInfo.latitude; lon = ipInfo.longitude;
+      address = `${city}, ${region}, ${country}`;
     }
 
     const payload = { method, latitude: lat, longitude: lon, address, city, region, country, ip, ...device };
